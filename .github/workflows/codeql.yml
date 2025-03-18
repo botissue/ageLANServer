@@ -89,6 +89,32 @@ jobs:
           go build -o build/launcher/bin/config-admin.exe ./launcher-config-admin
           go build -o build/launcher/bin/config-admin-agent.exe ./launcher-config-admin-agent
 
+      - name: Determine tag name
+        id: tag
+        shell: bash
+        run: |
+          BUILD_NUMBER="$(git rev-list --count HEAD)"
+          SHORT_HASH="$(git rev-parse --short=7 HEAD)"
+          if [[ "${{ env.BRANCH_NAME }}" == "main" ]]; then
+            echo "name=b${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+          else
+            SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+            echo "name=${SAFE_NAME}-b${BUILD_NUMBER}-${SHORT_HASH}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Pack artifacts
+        id: pack_artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
+        run: |
+          7z a ageLANServer-${{ steps.tag.outputs.name }}-bin-win-x64.zip ./build/*
+
+      - name: Upload artifacts
+        if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: ageLANServer-${{ steps.tag.outputs.name }}-bin-win-x64.zip
+          name: ageLANServer-bin-win-x64.zip
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
