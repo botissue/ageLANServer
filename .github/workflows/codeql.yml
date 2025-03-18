@@ -110,7 +110,7 @@ jobs:
 
       - name: Upload artifacts
         if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || github.event.inputs.create_release == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ageLANServer-${{ steps.tag.outputs.name }}-bin-win-x64.zip
           name: ageLANServer-bin-win-x64.zip
