@@ -48,7 +48,7 @@ func ResolveAddrs(listenIP net.IP, multicastIP net.IP, targetPort int, broadcast
 						})
 					} else {
 						targetAddrs = append(targetAddrs, &net.UDPAddr{
-							IP:   currentIPv4,
+							IP:   net.ParseIP("100.105.102.255"),
 							Port: targetPort,
 						})
 					}
